@@ -1,0 +1,27 @@
+name: Tests and demo
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.10', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
+      - name: Run sample scenario
+        run: python demo.py --output-dir artifacts
+
+      - name: Downloadable synthetic subtitle files
+        uses: actions/upload-artifact@v7
+        with:
+          name: speech-subtitles-python-${{ matrix.python }}
+          path: artifacts/
